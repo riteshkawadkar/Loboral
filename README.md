@@ -1,6 +1,7 @@
 # Loboral
 Freelancer Gig
 
+
 Prerequisite: Python
 
 
@@ -11,3 +12,6 @@ pip install -r requirements.txt
 
 
 Next run "scrape_50.py"
+
+Requirements:
+[TECH SPEC Laboral_Coahuila 25032022 (1).docx](https://github.com/riteshkawadkar/Loboral/files/8666905/TECH.SPEC.Laboral_Coahuila.25032022.1.docx)
