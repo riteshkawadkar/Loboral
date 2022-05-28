@@ -9,6 +9,8 @@ from datetime import datetime
 from unidecode import unidecode
 import sys
 import logging
+from pymongo import MongoClient
+
 
 
 def transformChars(uni_string):
@@ -29,11 +31,6 @@ def transformChars(uni_string):
              'Ü':'U'
              }
 
-  # Iterate over index
-  
-  # for element in range(0, len(uni_string)):
-  #   if element in uni_chars:
-  #     uni_string = uni_string.replace(element, uni_chars[element])
   
   for element in uni_chars:
     if element in uni_string:
@@ -43,7 +40,7 @@ def transformChars(uni_string):
     
 
 
-def fetch_data_from_offset(next_url, offset):
+def fetch_data_from_offset(next_url, offset,  ):
 
   try:
     url = base_url + next_url
@@ -160,12 +157,21 @@ def fetch_data_from_offset(next_url, offset):
         "fecha_insercion": isodate,
         "fecha_tecnica": isodate
       }
+      
+      duplicate_check = {
+        "actor": transformChars(actor),
+        "demandado": transformChars(demandado),
+        "expediente": transformChars(expendiente),
+        "fecha": fecha,
+        "juzgado": juzgado,
+      }
 
       if 'ERROR' == fecha:
         thisdict.clear()  
       else:
         counter+=1
         maindict[folio] = thisdict.copy()
+        records.update_one(duplicate_check, {'$set': thisdict.copy()}, upsert=True)
         thisdict.clear()  
         
       return {
@@ -173,7 +179,7 @@ def fetch_data_from_offset(next_url, offset):
             "next_url": next_url,
             "offset": offset,
             "timestamp": str(datetime.now()),
-            "count": MemoryDict['count'] + counter
+            "collection": scrape_key
             }
       
     for i in range(1, len(rows)):
@@ -262,12 +268,22 @@ def fetch_data_from_offset(next_url, offset):
         "fecha_insercion": isodate,
         "fecha_tecnica": isodate
       }
+      
+      duplicate_check = {
+        "actor": transformChars(actor),
+        "demandado": transformChars(demandado),
+        "expediente": transformChars(expendiente),
+        "fecha": fecha,
+        "juzgado": juzgado,
+      }
 
       if 'ERROR' == fecha:
         thisdict.clear()  
       else:
         counter+=1
         maindict[folio] = thisdict.copy()
+        # records.update_one(thisdict.copy(), upsert=True)
+        records.update_one(duplicate_check, {'$set': thisdict.copy()}, upsert=True)
         thisdict.clear()  
       
       
@@ -282,7 +298,7 @@ def fetch_data_from_offset(next_url, offset):
               "next_url": next_url,
               "offset": offset,
               "timestamp": str(datetime.now()),
-              "count": MemoryDict['count'] + counter
+              "collection": scrape_key
               }
 
   return {
@@ -290,7 +306,7 @@ def fetch_data_from_offset(next_url, offset):
             "next_url": next_url,
             "offset": offset,
             "timestamp": str(datetime.now()),
-            "count": MemoryDict['count'] + counter
+            "collection": scrape_key
             }
 
 
@@ -313,6 +329,15 @@ start_time = datetime.now()
 offset = 0
 
 scrape_keys = ['Listamonclova', 'Listasaltillo','Listasaltilloe', 'Listatorreon', 'Listamonclova', 'Listapiedras','Listasabinas', 'Listaacuna']
+# scrape_keys = ['Listamonclova']
+
+
+client = MongoClient("mongodb+srv://mongoadmin:mongoadmin@cluster0.keqe2go.mongodb.net/?retryWrites=true&w=majority")
+
+db = client.get_database("scrapers_db")
+
+records = db.folios
+index = db.index
 
 
 dic_juzgado = {
@@ -341,45 +366,27 @@ for scrape_key in scrape_keys:
   MemoryDict['offset'] = offset
   MemoryDict['timestamp'] = str(datetime.now())
   MemoryDict['count'] = 0
+  MemoryDict['collection'] = ''
+
 
   
   try:
+    
     while MemoryDict['next_url']:  
-      MemoryDict = fetch_data_from_offset(MemoryDict['next_url'], MemoryDict['offset'])
-
+      MemoryDict = fetch_data_from_offset(MemoryDict['next_url'], MemoryDict['offset'], scrape_key)
+      print(scrape_key)
+      index.update_one({'collection':scrape_key}, {'$set': MemoryDict}, upsert=True)
   except Exception as ee:  
     # Serializing json 
     print(MemoryDict)
     logging.error(MemoryDict)
 
-    
-    json_object = json.dumps(maindict, indent = 4, ensure_ascii=False)
-
-    with open(scrape_key + ".json", "w", encoding="utf8") as outfile:
-        outfile.write(json_object)   
-    
-    
-    index_object = json.dumps(MemoryDict, indent = 4)
-    # Writing to sample.json
-    with open(scrape_key + '_index.json', "w") as outfile:
-        outfile.write(index_object)
-    
     end_time = datetime.now()
     print('Duration: {}'.format(end_time - start_time))
     sys.exit(0)
 
-
-  # Serializing json 
-  index_object = json.dumps(MemoryDict, indent = 4)
-  json_object = json.dumps(maindict, indent = 4, ensure_ascii=False)
-
-  # Writing to sample.json
-  with open(scrape_key + '_index.json', "w") as outfile:
-      outfile.write(index_object)
-
-  with open(scrape_key + ".json", "w", encoding="utf8") as outfile:
-      outfile.write(json_object)   
-
+  # index.update_one({'collection':scrape_key}, {'$set': MemoryDict})
+  # records.insert_one(maindict)
 
   end_time = datetime.now()
   print('Duration: {}'.format(end_time - start_time))
