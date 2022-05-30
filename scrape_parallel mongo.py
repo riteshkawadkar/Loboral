@@ -40,7 +40,7 @@ def transformChars(uni_string):
     
 
 
-def fetch_data_from_offset(next_url, offset,  ):
+def fetch_data_from_offset(next_url, offset, scrape_key ):
 
   try:
     url = base_url + next_url
@@ -56,7 +56,7 @@ def fetch_data_from_offset(next_url, offset,  ):
 
     if 'Listatorreon' in url or 'Listamonclova' in url:
       next_url = None
-      offset = None
+      # offset = None
     else:
       # check if next page button is there
       try:
@@ -66,7 +66,7 @@ def fetch_data_from_offset(next_url, offset,  ):
         # print('Got Next URL = ' + next_url)
       except:
         next_url = None
-        offset = None
+        # offset = None
     
         
     counter = 0    
@@ -124,7 +124,9 @@ def fetch_data_from_offset(next_url, offset,  ):
                 logging.error('fecha = ' + str(fecha))
                 fecha = 'ERROR'
       
-
+      
+      
+      
       if scrape_key in dic_juzgado:
         juzgado = dic_juzgado.get(scrape_key)
         
@@ -179,7 +181,8 @@ def fetch_data_from_offset(next_url, offset,  ):
             "next_url": next_url,
             "offset": offset,
             "timestamp": str(datetime.now()),
-            "collection": scrape_key
+            "collection": scrape_key,
+            "count": MemoryDict['count'] + counter
             }
       
     for i in range(1, len(rows)):
@@ -298,7 +301,8 @@ def fetch_data_from_offset(next_url, offset,  ):
               "next_url": next_url,
               "offset": offset,
               "timestamp": str(datetime.now()),
-              "collection": scrape_key
+              "collection": scrape_key,
+              "count": MemoryDict['count'] + counter
               }
 
   return {
@@ -306,7 +310,8 @@ def fetch_data_from_offset(next_url, offset,  ):
             "next_url": next_url,
             "offset": offset,
             "timestamp": str(datetime.now()),
-            "collection": scrape_key
+            "collection": scrape_key,
+            "count": MemoryDict['count'] + counter
             }
 
 
@@ -325,8 +330,6 @@ def fetch_data_from_offset(next_url, offset,  ):
 
 start_time = datetime.now()
 
-# PROVIDE OFFSET VALUE HERE
-offset = 0
 
 scrape_keys = ['Listamonclova', 'Listasaltillo','Listasaltilloe', 'Listatorreon', 'Listamonclova', 'Listapiedras','Listasabinas', 'Listaacuna']
 # scrape_keys = ['Listamonclova']
@@ -338,6 +341,8 @@ db = client.get_database("scrapers_db")
 
 records = db.folios
 index = db.index
+
+
 
 
 dic_juzgado = {
@@ -353,6 +358,14 @@ dic_juzgado = {
 logging.basicConfig(filename='app.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 
 for scrape_key in scrape_keys:
+      
+  # PROVIDE OFFSET VALUE HERE
+  #Update OFFSET
+  try:
+    offsetno = index.find_one({'collection':scrape_key})
+    offset = offsetno['offset']
+  except:
+    offset = 0
 
   folio = 0
   maindict = {}
@@ -374,7 +387,7 @@ for scrape_key in scrape_keys:
     
     while MemoryDict['next_url']:  
       MemoryDict = fetch_data_from_offset(MemoryDict['next_url'], MemoryDict['offset'], scrape_key)
-      print(scrape_key)
+      # print(scrape_key)
       index.update_one({'collection':scrape_key}, {'$set': MemoryDict}, upsert=True)
   except Exception as ee:  
     # Serializing json 
