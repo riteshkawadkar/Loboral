@@ -350,9 +350,9 @@ scrape_keys = ['Listamonclova', 'Listasaltillo','Listasaltilloe', 'Listatorreon'
 
 client = MongoClient("mongodb+srv://mongoadmin:mongoadmin@cluster0.keqe2go.mongodb.net/?retryWrites=true&w=majority")
 
-db = client.get_database("scrapers_db")
+db = client.get_database("Crudo")
 
-records = db.folios
+records = db.Laboral_Coahuila
 index = db.index
 
 
