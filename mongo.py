@@ -8,12 +8,16 @@ records = db.index
 
 docu_count = records.count_documents({})
 
-print(docu_count)
+# print(docu_count)
 
 
-offsetno = records.find_one({'collection':'Listamonclova'})
-# print(list(records.find()))
-print(offsetno['offset'])
+# offsetno = records.find_one({'collection':'Listamonclova'})
+# # print(list(records.find()))
+# print(offsetno['offset'])
+
+result = records.update_one({'total_count':1}, {'$set': {'total_count':5}}, upsert=True)
+print(result.matched_count)
+
 
 
 

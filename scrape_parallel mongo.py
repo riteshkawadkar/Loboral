@@ -171,9 +171,14 @@ def fetch_data_from_offset(next_url, offset, scrape_key ):
       if 'ERROR' == fecha:
         thisdict.clear()  
       else:
-        counter+=1
+        
         maindict[folio] = thisdict.copy()
-        records.update_one(duplicate_check, {'$set': thisdict.copy()}, upsert=True)
+        result = records.update_one(duplicate_check, {'$set': thisdict.copy()}, upsert=True)
+        if result.matched_count > 0:
+          # its a duplicate, no need to add counter
+          pass
+        else:
+          counter+=1
         thisdict.clear()  
         
       return {
@@ -182,7 +187,8 @@ def fetch_data_from_offset(next_url, offset, scrape_key ):
             "offset": offset,
             "timestamp": str(datetime.now()),
             "collection": scrape_key,
-            "count": MemoryDict['count'] + counter
+            "count": MemoryDict['count'] + counter,
+            "total_count": MemoryDict['total_count'] + MemoryDict['count'] + counter
             }
       
     for i in range(1, len(rows)):
@@ -283,10 +289,15 @@ def fetch_data_from_offset(next_url, offset, scrape_key ):
       if 'ERROR' == fecha:
         thisdict.clear()  
       else:
-        counter+=1
+        # counter+=1
         maindict[folio] = thisdict.copy()
         # records.update_one(thisdict.copy(), upsert=True)
-        records.update_one(duplicate_check, {'$set': thisdict.copy()}, upsert=True)
+        result = records.update_one(duplicate_check, {'$set': thisdict.copy()}, upsert=True)
+        if result.matched_count > 0:
+              # its a duplicate, no need to add counter
+          pass
+        else:
+          counter+=1
         thisdict.clear()  
       
       
@@ -302,7 +313,8 @@ def fetch_data_from_offset(next_url, offset, scrape_key ):
               "offset": offset,
               "timestamp": str(datetime.now()),
               "collection": scrape_key,
-              "count": MemoryDict['count'] + counter
+              "count": MemoryDict['count'] + counter,
+              "total_count": MemoryDict['total_count'] + MemoryDict['count'] + counter
               }
 
   return {
@@ -311,7 +323,8 @@ def fetch_data_from_offset(next_url, offset, scrape_key ):
             "offset": offset,
             "timestamp": str(datetime.now()),
             "collection": scrape_key,
-            "count": MemoryDict['count'] + counter
+            "count": MemoryDict['count'] + counter,
+            "total_count": MemoryDict['total_count'] + MemoryDict['count'] + counter
             }
 
 
@@ -366,6 +379,11 @@ for scrape_key in scrape_keys:
     offset = offsetno['offset']
   except:
     offset = 0
+    
+  try:
+    total_count = offsetno['total_count']
+  except:
+    total_count = 0
 
   folio = 0
   maindict = {}
@@ -379,6 +397,7 @@ for scrape_key in scrape_keys:
   MemoryDict['offset'] = offset
   MemoryDict['timestamp'] = str(datetime.now())
   MemoryDict['count'] = 0
+  MemoryDict['total_count'] = total_count
   MemoryDict['collection'] = ''
 
 
