@@ -93,79 +93,80 @@ def fetch_data_from_offset(next_url, offset, scrape_key ):
             fecha = 'ERROR'
       elif '-' in fecha:
         try:
-          fecha = datetime.strptime(fecha, "%d-%m-%Y").strftime("%Y/%m/%d")
+          fecha = datetime.strptime(fecha, '%d-%m-%Y').strftime('%Y/%m/%d')
         except:
           try:
-            fecha = datetime.strptime(fecha, "%d-%b-%Y").strftime("%Y/%m/%d")
+            fecha = datetime.strptime(fecha, '%d-%b-%Y').strftime('%Y/%m/%d')
           except:
             try:
-              fecha = datetime.strptime(fecha, "%d-%m-%y").strftime("%Y/%m/%d")
+              fecha = datetime.strptime(fecha, '%d-%m-%y').strftime('%Y/%m/%d')
             except:
               try:
-                fecha = datetime.strptime(fecha, "%d-%b-%y").strftime("%Y/%m/%d")
+                fecha = datetime.strptime(fecha, '%d-%b-%y').strftime('%Y/%m/%d')
               except Exception as p:
                 logging.error(str(p) + ' = ' + str(folio))
                 logging.error('fecha = ' + str(fecha))
                 fecha = 'ERROR'
       else:
         try:
-            fecha = datetime.strptime(fecha, "%d/%m/%Y").strftime("%Y/%m/%d")
+            fecha = datetime.strptime(fecha, '%d/%m/%Y').strftime('%Y/%m/%d')
         except:
           try:
-            fecha = datetime.strptime(fecha, "%d/%b/%Y").strftime("%Y/%m/%d")
+            fecha = datetime.strptime(fecha, '%d/%b/%Y').strftime('%Y/%m/%d')
           except:
             try:
-              fecha = datetime.strptime(fecha, "%d/%m/%y").strftime("%Y/%m/%d")
+              fecha = datetime.strptime(fecha, '%d/%m/%y').strftime('%Y/%m/%d')
             except:
               try:
-                fecha = datetime.strptime(fecha, "%d/%b/%y").strftime("%Y/%m/%d")
+                fecha = datetime.strptime(fecha, '%d/%b/%y').strftime('%Y/%m/%d')
               except Exception as p:
                 logging.error(str(p) + ' = ' + str(folio))
                 logging.error('fecha = ' + str(fecha))
                 fecha = 'ERROR'
       
       
-      
+      fecha_object = datetime.strptime(fecha, '%Y/%m/%d')
+      isodate_fecha = 'ISODate(' + fecha_object.isoformat() + '.000Z' + ')'
       
       if scrape_key in dic_juzgado:
         juzgado = dic_juzgado.get(scrape_key)
         
-      isodate = "ISODate(" + datetime.now().isoformat()[:23] + "Z" + ")"
+      isodate = 'ISODate(' + datetime.now().isoformat()[:23] + 'Z' + ')'
         
       thisdict = {
-        "actor": transformChars(actor),
-        "demandado": transformChars(demandado),
-        "entidad": " COAHUILA ",
-        "expediente": transformChars(expendiente),
-        "fecha": fecha,
-        "fuero": "COMUN",
-        "juzgado": juzgado,
-        "tipo": transformChars(tipo),
-        "acuerdos": transformChars(acuerdos),
-        "monto": "",
-        "fecha_presentacion": "",
-        "actos_reclamados": "",
-        "actos_reclamados_especificos": "",
-        "Naturaleza_procedimiento": "",
-        "Prestación_demandada": "",
-        "Organo_jurisdiccional_origen": "",
-        "expediente_origen": "",
-        "materia": "LABORAL",
-        "submateria": "",
-        "fecha_sentencia": "",
-        "sentido_sentencia": "",
-        "resoluciones": "",
-        "origen": " SECRETARIA DEL TRABAJO DEL ESTADO DE COAHUILA ",
-        "fecha_insercion": isodate,
-        "fecha_tecnica": isodate
+        'actor': transformChars(actor),
+        'demandado': transformChars(demandado),
+        'entidad': ' COAHUILA ',
+        'expediente': transformChars(expendiente),
+        'fecha': fecha,
+        'fuero': 'COMUN',
+        'juzgado': juzgado,
+        'tipo': transformChars(tipo),
+        'acuerdos': transformChars(acuerdos),
+        'monto': '',
+        'fecha_presentacion': '',
+        'actos_reclamados': '',
+        'actos_reclamados_especificos': '',
+        'Naturaleza_procedimiento': '',
+        'Prestación_demandada': '',
+        'Organo_jurisdiccional_origen': '',
+        'expediente_origen': '',
+        'materia': 'LABORAL',
+        'submateria': '',
+        'fecha_sentencia': '',
+        'sentido_sentencia': '',
+        'resoluciones': '',
+        'origen': ' SECRETARIA DEL TRABAJO DEL ESTADO DE COAHUILA ',
+        'fecha_insercion': isodate,
+        'fecha_tecnica': isodate_fecha
       }
       
       duplicate_check = {
-        "actor": transformChars(actor),
-        "demandado": transformChars(demandado),
-        "expediente": transformChars(expendiente),
-        "fecha": fecha,
-        "juzgado": juzgado,
+        'actor': transformChars(actor),
+        'demandado': transformChars(demandado),
+        'expediente': transformChars(expendiente),
+        'fecha': fecha,
+        'juzgado': juzgado,
       }
 
       if 'ERROR' == fecha:
@@ -173,6 +174,7 @@ def fetch_data_from_offset(next_url, offset, scrape_key ):
       else:
         
         maindict[folio] = thisdict.copy()
+        # dictionary as a document
         result = records.update_one(duplicate_check, {'$set': thisdict.copy()}, upsert=True)
         if result.matched_count > 0:
           # its a duplicate, no need to add counter
@@ -182,13 +184,13 @@ def fetch_data_from_offset(next_url, offset, scrape_key ):
         thisdict.clear()  
         
       return {
-            "folio": folio,
-            "next_url": next_url,
-            "offset": offset,
-            "timestamp": str(datetime.now()),
-            "collection": scrape_key,
-            "count": MemoryDict['count'] + counter,
-            "total_count": MemoryDict['total_count'] + MemoryDict['count'] + counter
+            'folio': folio,
+            'next_url': next_url,
+            'offset': offset,
+            'timestamp': str(datetime.now()),
+            'collection': scrape_key,
+            'count': MemoryDict['count'] + counter,
+            'total_count': MemoryDict['total_count'] + MemoryDict['count'] + counter
             }
       
     for i in range(1, len(rows)):
@@ -214,32 +216,32 @@ def fetch_data_from_offset(next_url, offset, scrape_key ):
             fecha = 'ERROR'
       elif '-' in fecha:
         try:
-          fecha = datetime.strptime(fecha, "%d-%m-%Y").strftime("%Y/%m/%d")
+          fecha = datetime.strptime(fecha, '%d-%m-%Y').strftime('%Y/%m/%d')
         except:
           try:
-            fecha = datetime.strptime(fecha, "%d-%b-%Y").strftime("%Y/%m/%d")
+            fecha = datetime.strptime(fecha, '%d-%b-%Y').strftime('%Y/%m/%d')
           except:
             try:
-              fecha = datetime.strptime(fecha, "%d-%m-%y").strftime("%Y/%m/%d")
+              fecha = datetime.strptime(fecha, '%d-%m-%y').strftime('%Y/%m/%d')
             except:
               try:
-                fecha = datetime.strptime(fecha, "%d-%b-%y").strftime("%Y/%m/%d")
+                fecha = datetime.strptime(fecha, '%d-%b-%y').strftime('%Y/%m/%d')
               except Exception as p:
                 logging.error(str(p) + ' = ' + str(folio))
                 logging.error('fecha = ' + str(fecha))
                 fecha = 'ERROR'
       else:
         try:
-            fecha = datetime.strptime(fecha, "%d/%m/%Y").strftime("%Y/%m/%d")
+            fecha = datetime.strptime(fecha, '%d/%m/%Y').strftime('%Y/%m/%d')
         except:
           try:
-            fecha = datetime.strptime(fecha, "%d/%b/%Y").strftime("%Y/%m/%d")
+            fecha = datetime.strptime(fecha, '%d/%b/%Y').strftime('%Y/%m/%d')
           except:
             try:
-              fecha = datetime.strptime(fecha, "%d/%m/%y").strftime("%Y/%m/%d")
+              fecha = datetime.strptime(fecha, '%d/%m/%y').strftime('%Y/%m/%d')
             except:
               try:
-                fecha = datetime.strptime(fecha, "%d/%b/%y").strftime("%Y/%m/%d")
+                fecha = datetime.strptime(fecha, '%d/%b/%y').strftime('%Y/%m/%d')
               except Exception as p:
                 logging.error(str(p) + ' = ' + str(folio))
                 logging.error('fecha = ' + str(fecha))
@@ -248,42 +250,45 @@ def fetch_data_from_offset(next_url, offset, scrape_key ):
       if scrape_key in dic_juzgado:
             juzgado = dic_juzgado.get(scrape_key)
       
-      isodate = "ISODate(" + datetime.now().isoformat()[:23] + "Z" + ")"
-                
+      isodate = 'ISODate(' + datetime.now().isoformat()[:23] + 'Z' + ')'
+      
+      # fecha_object = datetime.strptime(fecha, '%Y/%m/%d')
+      # isodate_fecha = 'ISODate(' + fecha_object.isoformat() + '.000Z' + ')'
+               
       thisdict = {
-        "actor": transformChars(actor),
-        "demandado": transformChars(demandado),
-        "entidad": " COAHUILA ",
-        "expediente": transformChars(expendiente),
-        "fecha": fecha,
-        "fuero": "COMUN",
-        "juzgado": juzgado,
-        "tipo": transformChars(tipo),
-        "acuerdos": transformChars(acuerdos),
-        "monto": "",
-        "fecha_presentacion": "",
-        "actos_reclamados": "",
-        "actos_reclamados_especificos": "",
-        "Naturaleza_procedimiento": "",
-        "Prestación_demandada": "",
-        "Organo_jurisdiccional_origen": "",
-        "expediente_origen": "",
-        "materia": "LABORAL",
-        "submateria": "",
-        "fecha_sentencia": "",
-        "sentido_sentencia": "",
-        "resoluciones": "",
-        "origen": " SECRETARIA DEL TRABAJO DEL ESTADO DE COAHUILA ",
-        "fecha_insercion": isodate,
-        "fecha_tecnica": isodate
+        'actor': transformChars(actor),
+        'demandado': transformChars(demandado),
+        'entidad': ' COAHUILA ',
+        'expediente': transformChars(expendiente),
+        'fecha': fecha,
+        'fuero': 'COMUN',
+        'juzgado': juzgado,
+        'tipo': transformChars(tipo),
+        'acuerdos': transformChars(acuerdos),
+        'monto': '',
+        'fecha_presentacion': '',
+        'actos_reclamados': '',
+        'actos_reclamados_especificos': '',
+        'Naturaleza_procedimiento': '',
+        'Prestación_demandada': '',
+        'Organo_jurisdiccional_origen': '',
+        'expediente_origen': '',
+        'materia': 'LABORAL',
+        'submateria': '',
+        'fecha_sentencia': '',
+        'sentido_sentencia': '',
+        'resoluciones': '',
+        'origen': ' SECRETARIA DEL TRABAJO DEL ESTADO DE COAHUILA ',
+        'fecha_insercion': isodate,
+        'fecha_tecnica': isodate_fecha
       }
       
       duplicate_check = {
-        "actor": transformChars(actor),
-        "demandado": transformChars(demandado),
-        "expediente": transformChars(expendiente),
-        "fecha": fecha,
-        "juzgado": juzgado,
+        'actor': transformChars(actor),
+        'demandado': transformChars(demandado),
+        'expediente': transformChars(expendiente),
+        'fecha': fecha,
+        'juzgado': juzgado,
       }
 
       if 'ERROR' == fecha:
@@ -292,6 +297,7 @@ def fetch_data_from_offset(next_url, offset, scrape_key ):
         # counter+=1
         maindict[folio] = thisdict.copy()
         # records.update_one(thisdict.copy(), upsert=True)
+        # dictionary as a document
         result = records.update_one(duplicate_check, {'$set': thisdict.copy()}, upsert=True)
         if result.matched_count > 0:
               # its a duplicate, no need to add counter
@@ -308,23 +314,23 @@ def fetch_data_from_offset(next_url, offset, scrape_key ):
       logging.error('Scraping URl = ' + url)
       logging.error(str(e) + ' = ' + str(folio))
       return {
-              "folio": folio,
-              "next_url": next_url,
-              "offset": offset,
-              "timestamp": str(datetime.now()),
-              "collection": scrape_key,
-              "count": MemoryDict['count'] + counter,
-              "total_count": MemoryDict['total_count'] + MemoryDict['count'] + counter
+              'folio': folio,
+              'next_url': next_url,
+              'offset': offset,
+              'timestamp': str(datetime.now()),
+              'collection': scrape_key,
+              'count': MemoryDict['count'] + counter,
+              'total_count': MemoryDict['total_count'] + MemoryDict['count'] + counter
               }
 
   return {
-            "folio": folio,
-            "next_url": next_url,
-            "offset": offset,
-            "timestamp": str(datetime.now()),
-            "collection": scrape_key,
-            "count": MemoryDict['count'] + counter,
-            "total_count": MemoryDict['total_count'] + MemoryDict['count'] + counter
+            'folio': folio,
+            'next_url': next_url,
+            'offset': offset,
+            'timestamp': str(datetime.now()),
+            'collection': scrape_key,
+            'count': MemoryDict['count'] + counter,
+            'total_count': MemoryDict['total_count'] + MemoryDict['count'] + counter
             }
 
 
@@ -348,20 +354,21 @@ scrape_keys = ['Listamonclova', 'Listasaltillo','Listasaltilloe', 'Listatorreon'
 # scrape_keys = ['Listamonclova']
 
 
-client = MongoClient("mongodb+srv://mongoadmin:mongoadmin@cluster0.keqe2go.mongodb.net/?retryWrites=true&w=majority")
+# client = MongoClient('mongodb+srv://mongoadmin:mongoadmin@cluster0.keqe2go.mongodb.net/?retryWrites=true&w=majority')
+client = MongoClient('mongodb://Pad18:ER8Bsy2zIFpAFZiV@104.225.140.236:27017/Crudo')
 
-db = client.get_database("Crudo")
+# use database named "Crudo"
+db = client.get_database('Crudo')
 
+# use collection named "Laboral_Coahuila"
 records = db.Laboral_Coahuila
-index = db.index
 
-
-
+# index = db.index
 
 dic_juzgado = {
   'Listasaltillo':'JUNTA LOCAL DE CONCILIACION Y ARBITRAJE DE SALTILLO',
   'Listasaltilloe':'JUNTA ESPECIAL DE CONCILIACION Y ARBITRAJE DE SALTILLO',
-  'Listatorreon': 'JUNTA LOCAL DE DE CONCILIACION Y ARBITRAJE DE CONCILIACION Y ARBITRAJE DE TORREON',
+  'Listatorreon': 'JUNTA LOCAL DE CONCILIACION Y ARBITRAJE DE TORREON',
   'Listamonclova': 'JUNTA LOCAL DE CONCILIACION Y ARBITRAJE DE MONCLOVA',
   'Listapiedras': 'JUNTA LOCAL DE CONCILIACION Y ARBITRAJE DE PIEDRAS NEGRAS',
   'Listasabinas': 'JUNTA LOCAL DE CONCILIACION Y ARBITRAJE DE SABINAS',
@@ -375,7 +382,7 @@ for scrape_key in scrape_keys:
   # PROVIDE OFFSET VALUE HERE
   #Update OFFSET
   try:
-    offsetno = index.find_one({'collection':scrape_key})
+    offsetno = records.find_one({'collection':scrape_key})
     offset = offsetno['offset']
   except:
     offset = 0
@@ -407,7 +414,8 @@ for scrape_key in scrape_keys:
     while MemoryDict['next_url']:  
       MemoryDict = fetch_data_from_offset(MemoryDict['next_url'], MemoryDict['offset'], scrape_key)
       # print(scrape_key)
-      index.update_one({'collection':scrape_key}, {'$set': MemoryDict}, upsert=True)
+      # dictionary as a document
+      records.update_one({'collection':scrape_key}, {'$set': MemoryDict}, upsert=True)
   except Exception as ee:  
     # Serializing json 
     print(MemoryDict)
