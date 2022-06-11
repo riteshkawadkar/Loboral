@@ -252,8 +252,8 @@ def fetch_data_from_offset(next_url, offset, scrape_key ):
       
       isodate = 'ISODate(' + datetime.now().isoformat()[:23] + 'Z' + ')'
       
-      # fecha_object = datetime.strptime(fecha, '%Y/%m/%d')
-      # isodate_fecha = 'ISODate(' + fecha_object.isoformat() + '.000Z' + ')'
+      fecha_object = datetime.strptime(fecha, '%Y/%m/%d')
+      isodate_fecha = 'ISODate(' + fecha_object.isoformat() + '.000Z' + ')'
                
       thisdict = {
         'actor': transformChars(actor),
