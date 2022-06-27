@@ -4,15 +4,9 @@ PRIMERO
 
 root - ERROR - Folio has blank fecha = 32926
 root - ERROR - fecha = 
-root - ERROR - Folio has blank fecha = 32502
-root - ERROR - fecha = 
-root - ERROR - Folio has blank fecha = 32501
-root - ERROR - fecha = 
-root - ERROR - Folio has blank fecha = 32436
-root - ERROR - fecha = 
-root - ERROR - Folio has blank fecha = 27989
-root - ERROR - fecha = 
-root - ERROR - time data '04/112015' does not match format '%d/%b/%y' = 3422
-root - ERROR - fecha = 04/112015
+root - ERROR - Scraping URl = http://187.160.245.251:8088/acuerdos/Listatorreon.jsp?offset=0
+root - ERROR - time data 'ERROR' does not match format '%Y/%m/%d' = 32926
 root - ERROR - Folio has blank fecha = 21
 root - ERROR - fecha = 
+root - ERROR - Scraping URl = http://187.160.245.251:8088/acuerdos/Listapiedras.jsp?offset=11150
+root - ERROR - time data 'ERROR' does not match format '%Y/%m/%d' = 21
